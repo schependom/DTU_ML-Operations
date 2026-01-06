@@ -6,7 +6,7 @@
 
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0 
+    rev: v6.0.0 
     # This version is automatically managed.
     # The '.github/workflows/pre-commit-update.yaml' workflow runs `uv run pre-commit autoupdate` according to a schedule (cronjob).
     # If a newer version is found, that workflow updates this line and opens a Pull Request with the changes.
