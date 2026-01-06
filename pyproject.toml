@@ -7,7 +7,7 @@ name = "ml_ops"
 version = "0.0.1"
 description = "Repository for the DTU Machine Learning Operations course."
 authors = [
-  { name = "Vincent Van Schependom", email = "your@email.com" },
+  { name = "Vincent Van Schependom", email = "vincent.van.schependom@gmail.com" },
 ]
 license = { file = "LICENSE" }
 keywords = ["machine learning", "MLOps"]
@@ -20,6 +20,8 @@ requires-python = ">=3.12"
 dependencies = [
     "fastapi==0.115.6",
     "gdown>=5.2.0",
+    "matplotlib>=3.10.8",
+    "scikit-learn>=1.8.0",
     "torch==2.6.0",
     "typer==0.15.1",
     "uvicorn==0.34.0",
