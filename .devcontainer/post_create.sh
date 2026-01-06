@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+# This script is run after the container is created.
+
 # Install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
 source $HOME/.cargo/env

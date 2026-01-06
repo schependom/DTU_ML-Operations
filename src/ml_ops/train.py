@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import torch
 import typer
+
 from .data import corrupt_mnist
 from .model import MyAwesomeModel
-
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+from .device import DEVICE
 
 
 def train(lr: float = 1e-3, batch_size: int = 32, epochs: int = 10) -> None:

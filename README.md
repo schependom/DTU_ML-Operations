@@ -98,6 +98,17 @@ uv add <package-name> --group dev
 # e.g. uv add pytest --group dev
 ```
 
+### Requirements files
+
+The `requirements.txt` and `requirements-dev.txt` files are automatically generated from `pyproject.toml` and `uv.lock`. They are provided for compatibility with tools that do not support `pyproject.toml` (e.g. some CIs or older docker builds), and for users who prefer `pip` + `conda`.
+
+Do **not** edit these files manually. Instead, update `pyproject.toml` and then run the following command to sync them:
+
+```bash
+uv export --format requirements-txt --output-file requirements.txt
+uv export --format requirements-txt --only-group dev --output-file requirements-dev.txt
+```
+
 ### Running scripts
 
 Running a script inside the virtual environment can be done with:

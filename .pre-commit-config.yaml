@@ -1,8 +1,15 @@
+# This configuration file is for pre-commit, a framework for managing and maintaining multi-language pre-commit hooks.
+# The pre-commit tool is ran before committing code to ensure code quality and consistency.
+
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
+
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v3.2.0 
+    # This version is automatically managed.
+    # The '.github/workflows/pre-commit-update.yaml' workflow runs `uv run pre-commit autoupdate` according to a schedule (cronjob).
+    # If a newer version is found, that workflow updates this line and opens a Pull Request with the changes.
     hooks:
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
