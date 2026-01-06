@@ -1,5 +1,7 @@
 import torch
 import typer
+import os
+from torch.utils.data import Dataset
 
 
 def normalize(images: torch.Tensor) -> torch.Tensor:
@@ -43,6 +45,29 @@ def corrupt_mnist() -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]
     train_set = torch.utils.data.TensorDataset(train_images, train_target)
     test_set = torch.utils.data.TensorDataset(test_images, test_target)
     return train_set, test_set
+
+
+class MyDataset(Dataset):
+    """My custom dataset."""
+
+    def __init__(self, data_dir: str, train: bool = True) -> None:
+        if train:
+            self.images = []
+            self.targets = []
+            for i in range(6):
+                self.images.append(torch.load(os.path.join(data_dir, f"train_images_{i}.pt")))
+                self.targets.append(torch.load(os.path.join(data_dir, f"train_target_{i}.pt")))
+            self.images = torch.cat(self.images)
+            self.targets = torch.cat(self.targets)
+        else:
+            self.images = torch.load(os.path.join(data_dir, "test_images.pt"))
+            self.targets = torch.load(os.path.join(data_dir, "test_target.pt"))
+
+    def __len__(self) -> int:
+        return len(self.targets)
+
+    def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
+        return self.images[idx], self.targets[idx]
 
 
 if __name__ == "__main__":
