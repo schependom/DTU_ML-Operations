@@ -1,0 +1,4 @@
+[core]
+    remote = hpc_storage
+['remote "hpc_storage"']
+    url = ssh://gbar1/MLOps-storage

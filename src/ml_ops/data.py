@@ -1,6 +1,7 @@
+import os
+
 import torch
 import typer
-import os
 from torch.utils.data import Dataset
 
 
@@ -65,9 +66,6 @@ class MyDataset(Dataset):
 
     def __len__(self) -> int:
         return len(self.targets)
-
-    def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
-        return self.images[idx], self.targets[idx]
 
 
 if __name__ == "__main__":

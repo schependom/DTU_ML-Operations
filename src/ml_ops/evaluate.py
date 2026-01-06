@@ -2,8 +2,8 @@ import torch
 import typer
 
 from .data import corrupt_mnist
-from .model import MyAwesomeModel
 from .device import DEVICE
+from .model import MyAwesomeModel
 
 
 def evaluate(model_checkpoint: str) -> None:

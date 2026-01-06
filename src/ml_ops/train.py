@@ -3,8 +3,8 @@ import torch
 import typer
 
 from .data import corrupt_mnist
-from .model import MyAwesomeModel
 from .device import DEVICE
+from .model import MyAwesomeModel
 
 
 def train(lr: float = 1e-3, batch_size: int = 32, epochs: int = 10) -> None:
