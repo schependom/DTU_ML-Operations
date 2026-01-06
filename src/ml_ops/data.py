@@ -55,7 +55,7 @@ class MyDataset(Dataset):
         if train:
             self.images = []
             self.targets = []
-            num_train = len(os.listdir(data_dir)) // 2
+            num_train = (len(os.listdir(data_dir)) - 2) // 2  # Exclude test files
             for i in range(num_train):
                 self.images.append(torch.load(os.path.join(data_dir, f"train_images_{i}.pt")))
                 self.targets.append(torch.load(os.path.join(data_dir, f"train_target_{i}.pt")))
