@@ -1,4 +1,4 @@
-name: Unit Tests
+name: Unit Tests (old one, using requirements.txt)
 
 # This workflow runs unit tests, but uses
 # requirements.txt for installing dependencies.
