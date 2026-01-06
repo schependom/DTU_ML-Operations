@@ -1,4 +1,4 @@
-# ml_ops
+# DTU Machine Learning Operations
 
 Repository for the DTU Machine Learning Operations course.
 
