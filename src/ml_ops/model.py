@@ -26,6 +26,65 @@ class MyAwesomeModel(nn.Module):
         return self.fc1(x)
 
 
+#########
+# Commenting best practice (1):
+#  add tensor dimensionality to code
+#########
+
+#       x = torch.randn(5, 10)                              # N x D
+#       y = torch.randn(7, 10)                              # M x D
+#       xy = x.unsqueeze(1) - y.unsqueeze(0)                # (N x 1 x D) - (1 x M x D) = (N x M x D)
+#       pairwise_euc_dist = xy.abs().pow(2.0).sum(dim=-1)   # N x M
+
+########
+# How do these dimensionality manipulations work?
+########
+
+#### 1. Unsqueeze
+#
+# Adds a dimension of size 1 at the specified position.
+# Example: If x has shape (5, 10), then x.unsqueeze(1) will have shape (5, 1, 10).
+
+#### 2. Broadcasting
+#
+# When performing operations on tensors x and y of different shapes,
+#  PyTorch looks at the dimensions FROM RIGHT to LEFT (!) and applies the following rules:
+#  - If the dimensions are equal, they are compatible.
+#  - If one of the dimensions is 1, it is stretched to match the other dimension.
+#  - If the dimensions are different and neither is 1, an error is raised.
+#
+# Example:
+#
+#   In the expression x.unsqueeze(1) - y.unsqueeze(0),
+#   x.unsqueeze(1) has shape (N, 1, D) and y.unsqueeze(0) has shape (1, M, D).
+#
+#  The dimensions are compared as follows:
+#
+#   - Dim 2
+#     - D vs D
+#     - equal, compatible
+#     - Resulting dim: D
+#
+#   - Dim 1
+#     - 1 vs M
+#     - `x` has size 1. PyTorch copies the row of `x` M times.
+#     - Resulting dim: M
+#
+#   - Dim 0
+#     - N vs 1
+#     - `y` has size 1. PyTorch copies the column of `y` N times.
+#     - Resulting dim: N
+#
+#  Resulting shape after broadcasting: (N, M, D).
+#  The output tensor xy at index [i, j, :] contains the vector result of x[i]−y[j]
+
+
+#########
+# Commenting best practice (2):
+#  add docstrings to functions and classes
+#########
+
+
 if __name__ == "__main__":
     model = MyAwesomeModel()
     print(f"Model architecture: {model}")
