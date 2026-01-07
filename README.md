@@ -452,6 +452,8 @@ docker system prune
 
 ### Docker Best Practices
 
+Keep these best practices in mind when working with Docker:
+
 -   **Use `--rm`**: Automatically remove containers after they exit to avoid clutter
 -   **Mount volumes**: For **models** (`models/`), **outputs** (`reports/`) and **configs** (`configs/`) instead of copying files
 -   **Copy, and don't mount, static data**: For large, unchanging datasets (`data/`) to keep container self-contained
