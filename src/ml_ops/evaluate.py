@@ -1,4 +1,5 @@
 import logging
+
 import torch
 from hydra import main
 from omegaconf import DictConfig, OmegaConf

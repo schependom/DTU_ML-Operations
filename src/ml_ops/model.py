@@ -1,12 +1,14 @@
+from typing import Optional
+
 import torch
-from torch import nn
 from omegaconf import DictConfig
+from torch import nn
 
 
 class MyAwesomeModel(nn.Module):
     """My awesome model."""
 
-    def __init__(self, model_conf: DictConfig = None) -> None:
+    def __init__(self, model_conf: Optional[DictConfig] = None) -> None:
         super().__init__()
         if model_conf is None:
             # Default values for backward compatibility
