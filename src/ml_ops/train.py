@@ -3,6 +3,7 @@ import logging
 import matplotlib.pyplot as plt
 import torch
 from hydra import main
+from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 
 from ml_ops.data import corrupt_mnist
@@ -29,18 +30,8 @@ def train(cfg: DictConfig) -> None:
 
     loss_fn = torch.nn.CrossEntropyLoss()
 
-    # Create optimizer from config
-    optimizer_cls = torch.optim.Adam
-    if cfg.optimizer == "nesterov":
-        optimizer_cls = torch.optim.SGD
-        optimizer = optimizer_cls(
-            model.parameters(),
-            lr=cfg.learning_rate,
-            momentum=0.9,
-            nesterov=True,
-        )
-    else:  # adam (default)
-        optimizer = optimizer_cls(model.parameters(), lr=cfg.learning_rate)
+    # Create optimizer using Hydra instantiate
+    optimizer = instantiate(cfg.optimizer, params=model.parameters())
 
     statistics = {"train_loss": [], "train_accuracy": []}
     for epoch in range(cfg.epochs):

@@ -2,7 +2,8 @@
 defaults:
   - model_conf
   - training_conf
-  - override optimizer: adam
+  - optimizer: adam
+  - _self_
 
 # Define which parts of config to use
 use_model_conf: true

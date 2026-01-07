@@ -1,5 +1,11 @@
 docs/site/
 
+# Hydra outputs (timestamped run directories with configs and logs)
+outputs/
+
+# Model files (managed by DVC, not Git)
+models/
+
 # test cache
 manual_test/
 

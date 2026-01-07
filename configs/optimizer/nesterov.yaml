@@ -1,4 +1,5 @@
 # Nesterov SGD optimizer configuration
+
 _target_: torch.optim.SGD
 lr: 0.001
 momentum: 0.9

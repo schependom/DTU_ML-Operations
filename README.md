@@ -236,12 +236,40 @@ dvc checkout
 
 ### Training
 
-To train the model, run either of the following commands:
+To train the model using the default configuration (`configs/config.yaml`), run:
 
 ```bash
 uvr invoke train
 uvr src/ml_ops/train.py
 uvr train # because we configured a script entry point in pyproject.toml
+```
+
+To train with custom parameters:
+
+```bash
+# Switch to Nesterov SGD
+uvr src/ml_ops/train.py optimizer=nesterov
+
+# Override optimizer params
+uvr src/ml_ops/train.py optimizer=adam optimizer.lr=0.01
+```
+
+Or create a new config file `configs/custom_config.yaml` with:
+
+```yaml
+defaults:
+    - my_new_model_conf
+    - my_new_training_conf
+    - optimizer: my_preferred_optimizer
+    - _self_
+use_my_new_model_conf: true
+use_my_new_training_conf: true
+```
+
+Then run training with the new config:
+
+```bash
+uvr src/ml_ops/train.py --config-name=custom_config
 ```
 
 ## Containerization
@@ -262,21 +290,30 @@ Build the evaluation image:
 docker build -f dockerfiles/evaluate.dockerfile . -t evaluate:latest
 ```
 
-For cross-platform builds (e.g., building for AMD64 on ARM Mac):
+<details>
+<summary>Cross-platform builds (e.g., building for AMD64 on ARM Mac)</summary>
+
+Some systems (like Apple M1/M2 Macs) use ARM architecture, which can lead to compatibility issues when sharing Docker images with others using AMD64 architecture (common in cloud and many desktops). To ensure compatibility, you can build images for a specific platform using the `--platform` flag.
 
 ```bash
+# ARM Mac (Apple Silicon) -> AMD64
 docker build --platform linux/amd64 -f dockerfiles/train.dockerfile . -t train:latest
+
+# Windows on AMD64 -> ARM64 (e.g. Apple Silicon)
+docker build --platform linux/arm64 -f dockerfiles/train.dockerfile . -t train:latest
 ```
+
+</details>
 
 ### Running Docker Containers
 
-Run training:
+Run training (using configurations in `configs/`):
 
 ```bash
 docker run --name experiment1 train:latest
 ```
 
-Run training with custom parameters (if your train script accepts them):
+Run training with custom parameters:
 
 ```bash
 docker run --name experiment2 train:latest --lr 0.01 --epochs 20
