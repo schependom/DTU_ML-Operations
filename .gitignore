@@ -188,3 +188,4 @@ data/*
 
 # Trained models (managed by DVC, not Git)
 models/
+/models
