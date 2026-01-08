@@ -189,3 +189,7 @@ data/*
 # Trained models (managed by DVC, not Git)
 models/
 /models
+
+datasets/
+analysis/profiling/viz/
+analysis/profiling/*.prof

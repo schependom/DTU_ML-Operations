@@ -29,6 +29,7 @@ dependencies = [
     "torch==2.9.1",
     "typer==0.15.1",
     "uvicorn==0.34.0",
+    "torchvision>=0.24.1",
 ]
 
 # Optional dependency groups, which can be installed using:
@@ -47,6 +48,7 @@ dev = [
     "mypy>=1.19.1", # static type checker
     "ruff>=0.14.10",
     "ty>=0.0.9",
+    "snakeviz>=2.2.2",
 ]
 
 [project.scripts]

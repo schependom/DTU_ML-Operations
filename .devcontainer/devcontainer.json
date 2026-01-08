@@ -3,9 +3,16 @@
 {
     "name": "ml_ops",
     // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-    "image": "mcr.microsoft.com/devcontainers/python:3.12-bullseye",
-    "features": {},
-
+    "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+    "features": {
+        "ghcr.io/devcontainers/features/python:1": {
+            "version": "3.12"
+        }
+    },
+    "runArgs": [
+        "--shm-size=8gb" // Critical for ML DataLoaders to prevent crashes
+        // This increases the shared memory size to 8GB
+    ],
     // Use 'postCreateCommand' to run commands after the container is created.
     "postCreateCommand": "bash .devcontainer/post_create.sh",
 
