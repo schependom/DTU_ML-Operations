@@ -68,9 +68,6 @@ train = "ml_ops.train:main" # creates an executable `train` script that calls sr
 torch = [
     { index = "pytorch-cpu" },
 ]
-torchvision = [
-    { index = "pytorch-cpu" },
-]
 
 [[tool.uv.index]]
 name = "pytorch-cpu"
