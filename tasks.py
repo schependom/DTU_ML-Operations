@@ -23,6 +23,12 @@ def train(ctx: Context) -> None:
 
 
 @task
+def train_lightning(ctx: Context) -> None:
+    """Train model with PyTorch Lightning."""
+    ctx.run(f"uv run src/{PROJECT_NAME}_pl/train.py", echo=True, pty=not WINDOWS)
+
+
+@task
 def test(ctx: Context) -> None:
     """Run tests."""
     ctx.run("uv run coverage run -m pytest tests/", echo=True, pty=not WINDOWS)
