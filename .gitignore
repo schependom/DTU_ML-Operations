@@ -193,3 +193,7 @@ models/
 datasets/
 analysis/profiling/viz/
 analysis/profiling/*.prof
+
+log/
+wandb/
+trace.json

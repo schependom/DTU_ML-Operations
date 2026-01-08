@@ -6,7 +6,8 @@ epochs: 10
 
 optimizer: adam
 
-loss_fn: cross_entropy
+loss_fn:
+  _target_: torch.nn.CrossEntropyLoss
 
 logging:
   log_interval: 100

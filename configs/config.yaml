@@ -5,6 +5,10 @@ defaults:
   - optimizer: adam
   - _self_
 
+wandb:
+  enabled: true
+
 # Define which parts of config to use
 use_model_conf: true
 use_training_conf: true
+use_wandb: true
