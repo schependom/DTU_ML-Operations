@@ -234,6 +234,18 @@ git switch main # or `git checkout main`
 dvc checkout
 ```
 
+### Environment Setup (WandB)
+
+To use Weights & Biases for experiment tracking, you need to set up your environment variables. Create a `.env` file in the project root with the following content:
+
+```bash
+WANDB_API_KEY=your_api_key_here
+WANDB_ENTITY=your_entity_name
+WANDB_PROJECT=your_project_name
+```
+
+The training script automatically loads these variables. You can find your API key in your WandB settings.
+
 ### Training
 
 To train the model using the default configuration (`configs/config.yaml`), run:
@@ -244,17 +256,88 @@ uvr src/ml_ops/train.py
 uvr train # because we configured a script entry point in pyproject.toml
 ```
 
-To train with custom parameters:
+**Training Process Overview:**
+When you run the training script:
+
+1.  **Configuration**: Hydra loads and composes configuration from `configs/`.
+2.  **Environment**: The script loads environment variables from `.env`.
+3.  **WandB**: Initializes tracking (if enabled) using credentials from `.env`.
+4.  **Data**: Loads processed MNIST data.
+5.  **Execution**: Runs the training loop, logging loss and accuracy.
+6.  **Artifacts**: Saves the trained model to `models/model.pth` and training plots to `reports/figures/`.
+
+#### Custom Hyperparameters (Hydra)
+
+You can override any configuration parameter from the command line:
 
 ```bash
-# Switch to Nesterov SGD
+# Change learning rate and batch size
+uvr src/ml_ops/train.py optimizer.lr=0.01 batch_size=64
+
+# Change number of epochs
+uvr src/ml_ops/train.py epochs=20
+
+# Switch optimizer config group (e.g. to nesterov.yaml)
 uvr src/ml_ops/train.py optimizer=nesterov
 
-# Override optimizer params
-uvr src/ml_ops/train.py optimizer=adam optimizer.lr=0.01
+# Disable WandB for a specific run
+uvr src/ml_ops/train.py wandb.enabled=false
 ```
 
-Or create a new config file `configs/custom_config.yaml` with:
+#### Hyperparameter Sweeps (WandB)
+
+To run a hyperparameter sweep to find the best model configuration:
+
+1.  **Initialize the sweep**:
+
+    ```bash
+    wandb sweep configs/sweep.yaml
+    ```
+
+    This prints a sweep ID (e.g., `entity/project/sweep_ID`).
+
+2.  **Start the agent**:
+
+    ```bash
+    wandb agent entity/project/sweep_ID
+    ```
+
+    The agent will run multiple training jobs with arguments defined in `parameters` section of `configs/sweep.yaml`.
+
+3.  **Link the best model to the registry** (optional):
+
+    After the sweep is complete, you can link the best model to a WandB model registry using the provided script:
+
+    ```bash
+    uvr src/ml_ops/link_best_model.py --sweep-id entity/project/sweep_ID
+    ```
+
+#### Model Registry Management
+
+To manage your models in the WandB Model Registry, we provide two scripts:
+
+1.  **Link Best Model from Sweep** (`link_best_model.py`):
+    Links the best model from a specific hyperparameter sweep.
+
+    ```bash
+    uvr src/ml_ops/link_best_model.py --sweep-id <sweep_id>
+    ```
+
+2.  **Auto-Register Best Model from History** (`auto_register_best_model.py`):
+    Scans all versions of a source artifact (e.g., `corrupt_mnist_model`) and links the one with the best metadata metric (e.g., highest `accuracy`) to the registry with "best" and "staging" aliases.
+
+    ```bash
+    uvr python src/ml_ops/promote_model.py \
+    --project-name "ml_ops_corrupt_mnist" \
+    --source-artifact "corrupt_mnist_model" \
+    --target-registry "Model-registry" \
+    --target-collection "corrupt-mnist" \
+    --metric-name "accuracy"
+    ```
+
+#### Custom Configuration Files
+
+You can also create a new config file `configs/custom_config.yaml` with:
 
 ```yaml
 defaults:
@@ -262,6 +345,8 @@ defaults:
     - my_new_training_conf
     - optimizer: my_preferred_optimizer
     - _self_
+wandb:
+    enabled: true # or false to disable
 use_my_new_model_conf: true
 use_my_new_training_conf: true
 ```

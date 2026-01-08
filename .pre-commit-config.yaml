@@ -18,6 +18,7 @@ repos:
 
 -   repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.8.6
+    # This version is automatically managed.
     hooks:
     # Run ruff linter with auto-fix
     -   id: ruff

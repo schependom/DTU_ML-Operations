@@ -1,3 +1,5 @@
+# Training script with CLI instead of Hydra.
+
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, cast
@@ -5,6 +7,7 @@ from typing import Any, Dict, List, Tuple, cast
 import hydra
 import matplotlib.pyplot as plt
 import torch
+import typer
 from dotenv import load_dotenv
 from hydra.utils import instantiate
 from loguru import logger
@@ -38,20 +41,16 @@ def setup_wandb(cfg: DictConfig) -> bool:
     try:
         wandb.login(key=api_key)
 
-        init_kwargs: Dict[str, Any] = {
+        init_args = {
             "config": cast(Dict[str, Any], OmegaConf.to_container(cfg, resolve=True)),
         }
 
         # Only set project and entity if not running a sweep (WandB handles this automatically in sweeps)
         if not os.getenv("WANDB_SWEEP_ID"):
-            entity = os.getenv("WANDB_ENTITY")
-            project = os.getenv("WANDB_PROJECT")
-            if entity:
-                init_kwargs["entity"] = entity
-            if project:
-                init_kwargs["project"] = project
+            init_args["entity"] = os.getenv("WANDB_ENTITY")
+            init_args["project"] = os.getenv("WANDB_PROJECT")
 
-        wandb.init(**init_kwargs)
+        wandb.init(**init_args)
         logger.success("Initialized Weights & Biases.")
         return True
     except Exception as e:
@@ -130,33 +129,6 @@ def log_roc_curves(targets: torch.Tensor, preds: torch.Tensor) -> None:
         logger.error(f"Failed to log ROC curves: {e}")
 
 
-@torch.no_grad()
-def evaluate(
-    model: torch.nn.Module,
-    dataloader: DataLoader,
-    loss_fn: Any,
-) -> Tuple[float, float]:
-    """Runs evaluation on the validation set."""
-    model.eval()
-    total_loss = 0.0
-    correct_preds = 0
-    total_samples = 0
-
-    for img, target in dataloader:
-        img, target = img.to(DEVICE), target.to(DEVICE)
-        y_pred = model(img)
-        loss = loss_fn(y_pred, target)
-
-        total_loss += loss.item() * img.size(0)
-        correct_preds += (y_pred.argmax(dim=1) == target).sum().item()
-        total_samples += img.size(0)
-
-    avg_loss = total_loss / total_samples
-    accuracy = correct_preds / total_samples
-
-    return avg_loss, accuracy
-
-
 # --- Core Logic ---
 
 
@@ -210,17 +182,28 @@ def train_one_epoch(
     return batch_losses, batch_accs, torch.cat(all_preds), torch.cat(all_targets)
 
 
-@hydra.main(config_path="../../configs", config_name="config", version_base="1.3")
-def train(cfg: DictConfig) -> None:
+def train(lr: float = 0.001, batch_size: int = 64, epochs: int = 5, wandb_enabled: bool = True) -> None:
     """Main training orchestrator."""
+
+    with hydra.initialize(version_base="1.3", config_path="../../configs"):
+        cfg = hydra.compose(
+            config_name="config",
+            overrides=[
+                f"learning_rate={lr}",
+                f"batch_size={batch_size}",
+                f"epochs={epochs}",
+                f"wandb.enabled={wandb_enabled}",
+                f"optimizer.lr={lr}",
+            ],
+        )
+
     logger.info(f"Configuration:\n{OmegaConf.to_yaml(cfg)}")
 
     use_wandb = setup_wandb(cfg)
 
     # Data & Model
-    train_set, val_set = corrupt_mnist()
+    train_set, _ = corrupt_mnist()
     train_loader = DataLoader(train_set, batch_size=cfg.batch_size, shuffle=True)
-    val_loader = DataLoader(val_set, batch_size=cfg.batch_size, shuffle=False)
     model = MyAwesomeModel(model_conf=cfg).to(DEVICE)
 
     optimizer = instantiate(cfg.optimizer, params=model.parameters())
@@ -245,18 +228,8 @@ def train(cfg: DictConfig) -> None:
             statistics["train_loss"].extend(losses)
             statistics["train_accuracy"].extend(accs)
 
-            # Validation
-            val_loss, val_acc = evaluate(model, val_loader, loss_fn)
-            logger.info(f"Epoch {epoch} | Validation Loss: {val_loss:.4f} | Validation Acc: {val_acc:.2%}")
-
+            # End of Epoch Logs
             if use_wandb:
-                wandb.log(
-                    {
-                        "validation_loss": val_loss,
-                        "validation_accuracy": val_acc,
-                        "epoch": epoch,
-                    }
-                )
                 log_roc_curves(epoch_targets, epoch_preds)
 
         logger.success("Training complete.")
@@ -299,4 +272,4 @@ def train(cfg: DictConfig) -> None:
 
 
 if __name__ == "__main__":
-    train()
+    typer.run(train)
