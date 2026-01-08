@@ -328,11 +328,11 @@ To manage your models in the WandB Model Registry, we provide two scripts:
 
     ```bash
     uvr python src/ml_ops/promote_model.py \
-    --project-name "ml_ops_corrupt_mnist" \
-    --source-artifact "corrupt_mnist_model" \
-    --target-registry "Model-registry" \
-    --target-collection "corrupt-mnist" \
-    --metric-name "accuracy"
+        --project-name "ml_ops_corrupt_mnist" \
+        --source-artifact "corrupt_mnist_model" \
+        --target-registry "Model-registry" \
+        --target-collection "corrupt-mnist" \
+        --metric-name "accuracy"
     ```
 
 #### Custom Configuration Files

@@ -32,6 +32,7 @@ dependencies = [
     "torchvision>=0.24.1",
     "loguru>=0.7.3",
     "wandb>=0.23.1",
+    "pytorch-lightning>=2.6.0",
 ]
 
 # Optional dependency groups, which can be installed using:
