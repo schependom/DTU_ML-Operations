@@ -1,13 +1,21 @@
 # Dependabot does not support updating
 # pre-commit so this workflow will do that
 
+# ISNT AUTOMATICALLY ENABLED
+#
+# Because this repo uses pre-commit.ci for automatic updates,
+# this workflow is only provided as an alternative.
+#
+# To enable automatic updates using this workflow,
+# uncomment the 'schedule' section under 'on:'.
+
 name: Pre-commit auto-update
 
 # On every branch daily at midnight UTC
 on:
-  schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch: {}  # Allows manual executions
+  # schedule:
+    # - cron: '0 0 * * *'
+  workflow_dispatch: {}  # Manual trigger
 
 permissions:
   contents: write

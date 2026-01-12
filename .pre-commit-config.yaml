@@ -4,6 +4,8 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 
+exclude: '^.github/workflows/'
+
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -27,3 +29,15 @@ repos:
     -   id: ruff-format
     # Check if okay now
     -   id: ruff-check
+
+# pre-commit.ci
+# ci:
+#     autofix_commit_msg: |
+#         [pre-commit.ci] Auto fixes from pre-commit hooks
+
+#     autofix_prs: true
+#     autoupdate_branch: ''
+#     autoupdate_commit_msg: '[pre-commit.ci] Pre-commit autoupdate'
+#     autoupdate_schedule: weekly
+#     skip: []
+#     submodules: false
