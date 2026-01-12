@@ -26,11 +26,17 @@ def link_model(artifact_path: str, aliases: list[str] = ["staging"]) -> None:
         api_key=os.getenv("WANDB_API_KEY"),
         overrides={"entity": os.getenv("WANDB_ENTITY"), "project": os.getenv("WANDB_PROJECT")},
     )
-    _, _, artifact_name_version = artifact_path.split("/")
+    entity, project, artifact_name_version = artifact_path.split("/")
     artifact_name, _ = artifact_name_version.split(":")
 
     artifact = api.artifact(artifact_path)
-    artifact.link(target_path=f"{os.getenv('WANDB_ENTITY')}/model-registry/{artifact_name}", aliases=aliases)
+
+    # If the artifact is already in a registry, use that registry. Otherwise default to 'model-registry'
+    target_project = project if "registry" in project else "model-registry"
+    target_path = f"{entity}/{target_project}/{artifact_name}"
+    print("Linking artifact to:", target_path)
+
+    artifact.link(target_path=target_path, aliases=aliases)
     artifact.save()
     typer.echo(f"Artifact {artifact_path} linked to {aliases}")
 
