@@ -19,7 +19,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Now uses uv for dependency management
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
@@ -35,7 +34,6 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-groups
 
-      # Download dvc data
       - uses: iterative/setup-dvc@v2
 
       - name: Pull DVC data
@@ -47,21 +45,25 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           
-          # Write the SSH key to the Ed25519 file
+          # 1. Setup the Ed25519 Key
           echo "$SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           
-          # Remove the passphrase from the new key file
+          # 2. Decrypt the key (Remove passphrase) so sshpass only has to handle the Org password
           ssh-keygen -p -f ~/.ssh/id_ed25519 -P "$DVC_SSH_PASSPHRASE" -N ""
 
+          # 3. Add Host to Known Hosts
           ssh-keyscan -H ${{ secrets.DVC_SSH_HOSTNAME }} >> ~/.ssh/known_hosts
 
+          # 4. Configure SSH to use the Key for this Hostname
           echo "Host gbar1" >> ~/.ssh/config
           echo "  HostName ${{ secrets.DVC_SSH_HOSTNAME }}" >> ~/.ssh/config
           echo "  User ${{ secrets.DVC_SSH_USERNAME }}" >> ~/.ssh/config
           echo "  IdentityFile ~/.ssh/id_ed25519" >> ~/.ssh/config
+          # This tells SSH: "Try the key, but if the server asks for a password too, that's fine."
+          echo "  PreferredAuthentications publickey,password,keyboard-interactive" >> ~/.ssh/config
 
-          # Check if sshpass is installed before attempting installation
+          # 5. Install sshpass if missing
           if ! command -v sshpass &> /dev/null; then
             echo "sshpass not found, installing..."
             if [ "$RUNNER_OS" == "Linux" ]; then
@@ -71,10 +73,10 @@ jobs:
             elif [ "$RUNNER_OS" == "Windows" ]; then
               choco install sshpass
             fi
-          else
-            echo "sshpass is already installed."
           fi
 
+          # 6. Run DVC Pull
+          # sshpass handles the Organization Password.
           uv run sshpass -p "$SSH_PASS" dvc pull
 
       - name: Run tests & coverage
