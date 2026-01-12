@@ -29,7 +29,7 @@ class MnistDataset(Dataset):
 
     def __init__(
         self,
-        data_folder: str = "data",
+        data_folder: str = "data/processed",
         train: bool = True,
         img_transform: transforms.Transform | None = None,
         target_transform: transforms.Transform | None = None,
@@ -45,13 +45,23 @@ class MnistDataset(Dataset):
         """Load images and targets from disk."""
         images, target = [], []
         if self.train:
-            nb_files = len([f for f in os.listdir(self.data_folder) if f.startswith("train_images")])
-            for i in range(nb_files):
-                images.append(torch.load(f"{self.data_folder}/train_images_{i}.pt"))
-                target.append(torch.load(f"{self.data_folder}/train_target_{i}.pt"))
+            # Check for single consolidated file (e.g. from data/processed)
+            if os.path.exists(os.path.join(self.data_folder, "train_images.pt")):
+                images.append(torch.load(os.path.join(self.data_folder, "train_images.pt")))
+                target.append(torch.load(os.path.join(self.data_folder, "train_target.pt")))
+            else:
+                # Check for split files (e.g. from data/raw)
+                nb_files = len([f for f in os.listdir(self.data_folder) if f.startswith("train_images")])
+                for i in range(nb_files):
+                    images.append(torch.load(os.path.join(self.data_folder, f"train_images_{i}.pt")))
+                    target.append(torch.load(os.path.join(self.data_folder, f"train_target_{i}.pt")))
         else:
-            images.append(torch.load(f"{self.data_folder}/test_images.pt"))
-            target.append(torch.load(f"{self.data_folder}/test_target.pt"))
+            images.append(torch.load(os.path.join(self.data_folder, "test_images.pt")))
+            target.append(torch.load(os.path.join(self.data_folder, "test_target.pt")))
+
+        if not images:
+            raise ValueError(f"No data found in {self.data_folder}")
+
         self.images = torch.cat(images, 0)
         self.target = torch.cat(target, 0)
 
@@ -69,7 +79,7 @@ class MnistDataset(Dataset):
         return self.images.shape[0]
 
 
-def dataset_statistics(datadir: str = "data") -> None:
+def dataset_statistics(datadir: str = "data/processed") -> None:
     """Compute dataset statistics."""
     train_dataset = MnistDataset(data_folder=datadir, train=True)
     test_dataset = MnistDataset(data_folder=datadir, train=False)

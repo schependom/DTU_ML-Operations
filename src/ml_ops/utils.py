@@ -3,7 +3,7 @@ import torch
 from mpl_toolkits.axes_grid1 import ImageGrid
 
 
-def show_image_and_target(images: torch.Tensor, target: torch.Tensor) -> None:
+def show_image_and_target(images: torch.Tensor, target: torch.Tensor, show: bool = True) -> None:
     """Plot images and their labels in a grid."""
     row_col = int(len(images) ** 0.5)
     fig = plt.figure(figsize=(10.0, 10.0))
@@ -12,4 +12,5 @@ def show_image_and_target(images: torch.Tensor, target: torch.Tensor) -> None:
         ax.imshow(im.squeeze(), cmap="gray")
         ax.set_title(f"Label: {label.item()}")
         ax.axis("off")
-    plt.show()
+    if show:
+        plt.show()
