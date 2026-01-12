@@ -31,6 +31,9 @@ def stage_best_model(
     source_artifact: str = typer.Option(
         ..., envvar="MODEL_ARTIFACT_NAME", help="The name of the artifact logged in the project (e.g., 'mnist-cnn')."
     ),
+    organization: str = typer.Option(
+        ..., envvar="WANDB_ORGANIZATION", help="The WandB organization that owns the target Registry."
+    ),
     # 2. Target Registry Config
     target_registry: str = typer.Option("Model-registry", envvar="WANDB_REGISTRY", help="The central Registry name."),
     target_collection: str = typer.Option(
@@ -97,7 +100,7 @@ def stage_best_model(
     # ------------------------------------------------------------------
     # Construct the target path required by WandB Registries.
     # Usually: entity/wandb-registry-{registry_name}/{collection_name}
-    target_path = f"{entity}/wandb-registry-{target_registry}/{target_collection}"
+    target_path = f"{organization}/wandb-registry-{target_registry}/{target_collection}"
 
     logger.info(f"🚀 Linking to Registry path: {target_path} ...")
 

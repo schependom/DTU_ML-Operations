@@ -36,41 +36,10 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-groups
 
-      - uses: iterative/setup-dvc@v2
+      - name: Install dvc
+        uses: ./.github/workflows/setup-dvc
 
-      - name: Configure DVC Credentials
-        env:
-          SSH_KEY: ${{ secrets.DVC_SSH_KEY }}
-          DVC_SSH_PASSPHRASE: ${{ secrets.DVC_SSH_PASSPHRASE }}
-          SSH_PASS: ${{ secrets.DTU_PASSWORD }}
-          REMOTE_NAME: "hpc_storage" # .dvc/config remote name
-        run: |
-          # Write the key to a local file in the workspace
-          echo "$SSH_KEY" > dvc_key_file
-
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            icacls dvc_key_file //inheritance:r
-            icacls dvc_key_file //grant:r "$(whoami):F"
-          else
-            chmod 600 dvc_key_file
-          fi
-
-          # Decrypt the key (Remove passphrase)
-          if [ -n "$DVC_SSH_PASSPHRASE" ]; then
-             # -f: filename, -p: old passphrase, -N: new passphrase (empty)
-             ssh-keygen -p -f dvc_key_file -P "$DVC_SSH_PASSPHRASE" -N ""
-          fi
-          
-          # Configure DVC Locally (Does not affect git tracking)
-          # This injects the credentials directly into DVC's runtime config
-          dvc remote modify --local $REMOTE_NAME user ${{ secrets.DVC_SSH_USERNAME }}
-          dvc remote modify --local $REMOTE_NAME keyfile "$(pwd)/dvc_key_file"
-          dvc remote modify --local $REMOTE_NAME password "$SSH_PASS"
-
-          # Use full hostname for DVC remote
-          dvc remote modify --local $REMOTE_NAME url "ssh://${{ secrets.DVC_SSH_HOSTNAME }}/zhome/c3/e/221590/MLOps-storage"
-
-      - name: Pull DVC data
+      - name: DVC pull
         run: uv run dvc pull
 
       - name: Check data statistics
