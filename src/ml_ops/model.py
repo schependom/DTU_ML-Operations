@@ -61,8 +61,7 @@ class MyAwesomeModel(nn.Module):
 
     def load_from_checkpoint(self, checkpoint_path: str) -> "MyAwesomeModel":
         """Load model from checkpoint."""
-        checkpoint = torch.load(checkpoint_path, map_location=torch.device("cpu"))
-        self.load_state_dict(checkpoint["state_dict"])
+        self.load_state_dict(torch.load(checkpoint_path, map_location=torch.device("cpu")))
         return self
 
 
