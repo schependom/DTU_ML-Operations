@@ -39,6 +39,13 @@ jobs:
           # 1. Write the key to a local file in the workspace
           echo "$SSH_KEY" > dvc_key_file
 
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            icacls dvc_key_file //inheritance:r
+            icacls dvc_key_file //grant:r "$(whoami):F"
+          else
+            chmod 600 dvc_key_file
+          fi
+
           # 2. Decrypt the key (Remove passphrase)
           if [ -n "$DVC_SSH_PASSPHRASE" ]; then
              # -f: filename, -p: old passphrase, -N: new passphrase (empty)
@@ -59,3 +66,7 @@ jobs:
 
       - name: Check data statistics
         run: uv run python src/ml_ops/dataset.py
+
+      - name: Cleanup SSH Key
+        if: always()  # Runs even if tests fail
+        run: rm -f dvc_key_file
