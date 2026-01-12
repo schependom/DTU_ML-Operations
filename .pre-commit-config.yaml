@@ -31,13 +31,13 @@ repos:
     -   id: ruff-check
 
 # pre-commit.ci
-# ci:
-#     autofix_commit_msg: |
-#         [pre-commit.ci] Auto fixes from pre-commit hooks
+ci:
+    autofix_commit_msg: |
+        [pre-commit.ci] Auto fixes from pre-commit hooks
 
-#     autofix_prs: true
-#     autoupdate_branch: ''
-#     autoupdate_commit_msg: '[pre-commit.ci] Pre-commit autoupdate'
-#     autoupdate_schedule: weekly
-#     skip: []
-#     submodules: false
+    autofix_prs: true
+    autoupdate_branch: ''
+    autoupdate_commit_msg: '[pre-commit.ci] Pre-commit autoupdate'
+    autoupdate_schedule: weekly
+    skip: []
+    submodules: false
