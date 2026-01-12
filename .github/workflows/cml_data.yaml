@@ -37,7 +37,7 @@ jobs:
         run: uv sync --all-groups
 
       - name: Install dvc
-        uses: ./.github/actions/setup-dvc/action.yaml
+        uses: ./.github/actions/setup-dvc
 
       - name: DVC pull
         run: uv run dvc pull
