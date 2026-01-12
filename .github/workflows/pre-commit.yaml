@@ -1,30 +1,34 @@
 name: Pre-commit CI
 
-# Check main branch with .pre-commit-config.yaml every time we push
-# and automatically commit fixes.
+# Auto integrate changes made by .pre-commit-config.yaml hooks
+#
+# ALTERNATIVE: use pre-commit.ci (only for public repos)
 
 on:
   push:
-    branches: [main]
   pull_request:
-    branches: [main]
 
 jobs:
   pre-commit:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # Needed to push fixes back to the repo
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Fetch all history so auto-commit can push successfully
+          fetch-depth: 0 
 
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version: "3.12"
 
-      - uses: pre-commit/action@v3.0.1
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.1
+        # We allow failure so the next step can commit the fixes
         continue-on-error: true
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style: auto-fixes from pre-commit"
-

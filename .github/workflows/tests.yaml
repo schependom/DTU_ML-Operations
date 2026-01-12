@@ -2,11 +2,10 @@ name: Unit Tests
 
 on:
   push:
-    branches:
-      - all
+    branches: # all
+      
   pull_request:
-    branches:
-      - all
+    branches: # all
 
 jobs:
   test:

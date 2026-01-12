@@ -3,7 +3,7 @@
 
 name: Pre-commit auto-update
 
-# On main branch every day at midnight
+# On every branch daily at midnight UTC
 on:
   schedule:
     - cron: '0 0 * * *'
