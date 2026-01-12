@@ -122,4 +122,4 @@ jobs:
 
       - name: Promote model to 'production' alias
         run: |
-          uv run python src/ml_ops/link_model.py $MODEL_NAME --aliases ["production"]
+          uv run python src/ml_ops/link_model.py $MODEL_NAME --aliases production
