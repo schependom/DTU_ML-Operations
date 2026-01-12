@@ -1,5 +1,21 @@
 name: 'Initialize DVC'
 description: 'Setup DVC and configure credentials'
+inputs:
+  DVC_SSH_KEY:
+    description: 'SSH Key for DVC'
+    required: true
+  DVC_SSH_PASSPHRASE:
+    description: 'Passphrase for SSH Key'
+    required: true
+  DTU_PASSWORD:
+    description: 'DTU Password'
+    required: true
+  DVC_SSH_USERNAME:
+    description: 'DVC SSH Username'
+    required: true
+  DVC_SSH_HOSTNAME:
+    description: 'DVC SSH Hostname'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -7,12 +23,12 @@ runs:
     - name: Configure DVC Credentials
       shell: bash
       env:
-        SSH_KEY: ${{ secrets.DVC_SSH_KEY }}
-        DVC_SSH_PASSPHRASE: ${{ secrets.DVC_SSH_PASSPHRASE }}
-        SSH_PASS: ${{ secrets.DTU_PASSWORD }}
+        SSH_KEY: ${{ inputs.DVC_SSH_KEY }}
+        DVC_SSH_PASSPHRASE: ${{ inputs.DVC_SSH_PASSPHRASE }}
+        SSH_PASS: ${{ inputs.DTU_PASSWORD }}
         REMOTE_NAME: "hpc_storage"
-        DVC_SSH_USERNAME: ${{ secrets.DVC_SSH_USERNAME }}
-        DVC_SSH_HOSTNAME: ${{ secrets.DVC_SSH_HOSTNAME }}
+        DVC_SSH_USERNAME: ${{ inputs.DVC_SSH_USERNAME }}
+        DVC_SSH_HOSTNAME: ${{ inputs.DVC_SSH_HOSTNAME }}
       run: |
         # Write the key to a local file in the workspace
         echo "$SSH_KEY" > dvc_key_file

@@ -76,6 +76,12 @@ jobs:
 
     - name: Install dvc
       uses: ./.github/actions/setup-dvc
+      with:
+        DVC_SSH_KEY: ${{ secrets.DVC_SSH_KEY }}
+        DVC_SSH_PASSPHRASE: ${{ secrets.DVC_SSH_PASSPHRASE }}
+        DTU_PASSWORD: ${{ secrets.DTU_PASSWORD }}
+        DVC_SSH_USERNAME: ${{ secrets.DVC_SSH_USERNAME }}
+        DVC_SSH_HOSTNAME: ${{ secrets.DVC_SSH_HOSTNAME }}
 
     - name: DVC pull
       run: |
