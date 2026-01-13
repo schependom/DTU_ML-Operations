@@ -1,0 +1,38 @@
+# GCP equivalent to workflow files for GitHub Actions.
+# A file that specifies a list of steps that should be executed to do something.
+#
+# This build command can be triggered by running:
+#
+#   gcloud builds submit . --config=cloudbuild.yaml
+#
+# This command will submit a build to the cloud build service using the configuration file cloudbuild.yaml in the current directory.
+# The . specifies that the build context is the current directory. The build context is all the files that are uploaded to the cloud
+# build service, thus if your Dockerfile has COPY commands that copy files from the local directory to the container, these files need
+# to be in the build context.
+#
+# Do note that by default all files in your .gitignore file are excluded from the build context, but you
+# can override this by using the --ignore-file flag,
+#
+# Instead of relying on manually submitting builds, we can setup the build process as continuous integration
+# such that it is triggered every time we push code to the repository.
+# This is done by setting up a TRIGGER in the GCP console.
+
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Build container image'
+  args: [
+    'build',
+    '.',
+    '-t',
+    'europe-west1-docker.pkg.dev/$PROJECT_ID/my-container-repository/my-instance',
+    '-f',
+    'dockerfiles/cloud.dockerfile'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Push container image'
+  args: [
+    'push',
+    'europe-west1-docker.pkg.dev/$PROJECT_ID/my-container-repository/my-instance'
+  ]
+options:
+  logging: CLOUD_LOGGING_ONLY
