@@ -12,8 +12,8 @@ import time
 
 import pytest
 import torch
-
 import wandb
+
 from ml_ops.model import MyAwesomeModel
 
 
