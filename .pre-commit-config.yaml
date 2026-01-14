@@ -24,12 +24,12 @@ repos:
     rev: v0.14.10
     # This version is automatically managed.
     hooks:
-    # Run ruff formatter
-    -   id: ruff-format
     # Check if okay now and fix
     -   id: ruff-check
         args:
             - "--fix"
+    # Run ruff formatter
+    -   id: ruff-format
 
 # pre-commit.ci
 ci:
