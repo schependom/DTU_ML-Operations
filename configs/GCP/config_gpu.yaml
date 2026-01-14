@@ -6,3 +6,5 @@ workerPoolSpecs:
     replicaCount: 1
     containerSpec:
         imageUri: europe-west1-docker.pkg.dev/dtumlops-484016/my-container-repository/my-instance:latest
+        # This image was automatically built and pushed to Artifact Registry
+        # using the cloudbuild.yaml file in the GCP folder.

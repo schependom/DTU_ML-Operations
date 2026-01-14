@@ -5,7 +5,6 @@ from typing import Any, Dict, List, Tuple, cast
 import hydra
 import matplotlib.pyplot as plt
 import torch
-import wandb
 from dotenv import load_dotenv
 from hydra.utils import instantiate
 from loguru import logger
@@ -14,6 +13,7 @@ from sklearn.metrics import RocCurveDisplay, accuracy_score, f1_score, precision
 from torch.utils.data import DataLoader
 from torchvision.utils import make_grid
 
+import wandb
 from ml_ops.data import corrupt_mnist
 from ml_ops.device import DEVICE
 from ml_ops.model import MyAwesomeModel
@@ -218,7 +218,7 @@ def train(cfg: DictConfig) -> None:
     use_wandb = setup_wandb(cfg)
 
     # Data & Model
-    train_set, val_set = corrupt_mnist()
+    train_set, val_set = corrupt_mnist(data_dir=cfg.data.data_dir, gcp=cfg.data.gcp)
     train_loader = DataLoader(train_set, batch_size=cfg.batch_size, shuffle=True)
     val_loader = DataLoader(val_set, batch_size=cfg.batch_size, shuffle=False)
     model = MyAwesomeModel(model_conf=cfg).to(DEVICE)

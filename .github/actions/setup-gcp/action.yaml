@@ -1,0 +1,23 @@
+# setup-gcp/action.yaml
+# This can be integrated in a GitHub Actions workflow to authenticate with GCP.
+# The action uses a service account key provided as a secret to authenticate.
+
+name: 'Auth with GCP'
+description: 'Authenticate to GCP using a service account key.'
+
+inputs:
+  GCLOUD_SERVICE_KEY:
+    description: 'GCP Service Account Key'
+    required: true
+
+runs:
+    using: "composite"
+    steps:
+
+    - name: 'Authenticate to GCP'
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ inputs.GCLOUD_SERVICE_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2

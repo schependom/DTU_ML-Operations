@@ -50,7 +50,7 @@ jobs:
           DVC_SSH_HOSTNAME: ${{ secrets.DVC_SSH_HOSTNAME }}
 
       - name: DVC pull
-        run: uv run dvc pull
+        run: uv run dvc pull --remote hpc_storage
 
       - name: Check data statistics
         run: uv run python src/ml_ops/dataset.py

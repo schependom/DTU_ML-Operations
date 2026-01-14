@@ -57,7 +57,7 @@ steps:
     '${_VERTEX_TRAIN_CONFIG}',
   ]
 substitutions:
-  _VERTEX_TRAIN_CONFIG: 'cloudbuild/config_gpu.yaml'
+  _VERTEX_TRAIN_CONFIG: 'configs/GCP/config_gpu.yaml'
 
 # 1. Specify the secret to be used in the build
 availableSecrets:

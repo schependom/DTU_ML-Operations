@@ -11,8 +11,13 @@ def normalize(images: torch.Tensor) -> torch.Tensor:
     return (images - images.mean()) / images.std()
 
 
-def preprocess_data(raw_dir: str, processed_dir: str) -> None:
+def preprocess_data(raw_dir: str, processed_dir: str, gcp: bool = False) -> None:
     """Process raw data and save it to processed directory."""
+
+    if gcp:
+        raw_dir = "/gcs/ml_ops_data_bucket_vis/raw"
+        processed_dir = "/gcs/ml_ops_data_bucket_vis/processed"
+
     train_images, train_target = [], []
     for i in range(6):
         train_images.append(torch.load(f"{raw_dir}/train_images_{i}.pt"))
@@ -38,10 +43,13 @@ def preprocess_data(raw_dir: str, processed_dir: str) -> None:
 
 
 def corrupt_mnist(
-    data_dir: Optional[str] = "data/processed",
+    data_dir: Optional[str] = "data/processed", gcp: bool = False
 ) -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     """Return train and test datasets for corrupt MNIST."""
-    if data_dir is None:
+    # Check if running on GCP to use Google Cloud Storage (GCS) path
+    if gcp:
+        data_dir = "/gcs/ml_ops_data_bucket_vis/"
+    elif data_dir is None:
         data_dir = "data/processed"
     train_images = torch.load(f"{data_dir}/train_images.pt")
     train_target = torch.load(f"{data_dir}/train_target.pt")

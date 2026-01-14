@@ -1,0 +1,47 @@
+# On push:
+# - run tests
+# - if they pass, continue
+# - build cloud.dockerfile into container image
+# - push container image to Artifact Registry
+# - trigger Vertex AI training job using the new container image
+#
+# This is an alternative to setting up a Trigger in GCP that listens to
+# git pushes and automatically runs the cloudbuild.yaml file.
+
+name: GCP CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # Dummy test job
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Run tests
+      run: echo "Running tests..."  # Replace with actual test commands
+
+  build:
+    needs: test # only continue if tests pass
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Auth with GCP
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Submit build
+      run: gcloud builds submit . --config GCP/cloudbuild.yaml --substitutions=_IMAGE_NAME="my-instance"

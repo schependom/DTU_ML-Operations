@@ -1,13 +1,21 @@
-FROM python:3.11-slim
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-# install python
+# Install some essentials
 RUN apt update && \
     apt install --no-install-recommends -y build-essential gcc && \
     apt clean && rm -rf /var/lib/apt/lists/*
 
-COPY cloud-req.txt cloud-req.txt
-COPY src/cloud_build_artifact_reg/main.py main.py
-WORKDIR /
-RUN pip install -r cloud-req.txt --no-cache-dir
+COPY pyproject.toml pyproject.toml
+COPY uv.lock uv.lock
+COPY src/ src/
+COPY data/ data/
+COPY configs/ configs/
 
-ENTRYPOINT ["python", "-u", "main.py"]
+WORKDIR /
+
+ENV UV_LINK_MODE=copy
+RUN --mount=type=cache,target=/root/.cache/uv uv sync
+
+RUN mkdir -p models reports/figures
+
+ENTRYPOINT ["uv", "run", "src/ml_ops/train.py", "+data.gcp=true"]

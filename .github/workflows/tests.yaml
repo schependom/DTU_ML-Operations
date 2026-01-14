@@ -54,7 +54,7 @@ jobs:
           DVC_SSH_HOSTNAME: ${{ secrets.DVC_SSH_HOSTNAME }}
 
       - name: Pull DVC data
-        run: uv run dvc pull
+        run: uv run dvc pull --remote hpc_storage
 
       - name: Cleanup SSH Key
         if: always()  # Runs even if tests fail

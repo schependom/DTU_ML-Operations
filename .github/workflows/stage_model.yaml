@@ -85,7 +85,7 @@ jobs:
 
     - name: DVC pull
       run: |
-        uv run dvc pull
+        uv run dvc pull --remote hpc_storage
 
     - name: Run tests
       run: |

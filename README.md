@@ -635,6 +635,18 @@ dvc push --no-run-cache # because GCS does not support run-cache
 dvc pull --no-run-cache
 ```
 
+### Cloudbuild
+
+Cloud Build allows you to run builds on GCP using a configuration file.
+To submit a build using the `cloudbuild.yaml` file:
+
+```bash
+gcloud builds submit . --config=GCP/cloudbuild.yaml
+```
+
+To automatically have Cloud Build run on every push, create a trigger in the GCP console.
+Go to `Cloud Build` -> `Triggers` -> `Create Trigger` and set it up to use `GCP/cloudbuild.yaml` on every push to `^main$` (this is a regex for the main branch).
+
 ### Using Vertex AI
 
 First, add your secrets (e.g. `WANDB_API_KEY`) to Secret Manager in GCP.

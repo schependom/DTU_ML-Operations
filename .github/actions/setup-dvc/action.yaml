@@ -35,7 +35,7 @@ runs:
       env:
         SSH_KEY: ${{ inputs.DVC_SSH_KEY }}
         DVC_SSH_PASSPHRASE: ${{ inputs.DVC_SSH_PASSPHRASE }}
-        SSH_PASS: ${{ inputs.DTU_PASSWORD }}
+        REMOTE_PASS: ${{ inputs.DTU_PASSWORD }}
         REMOTE_NAME: "hpc_storage"
         DVC_SSH_USERNAME: ${{ inputs.DVC_SSH_USERNAME }}
         DVC_SSH_HOSTNAME: ${{ inputs.DVC_SSH_HOSTNAME }}
@@ -64,7 +64,7 @@ runs:
         # This injects the credentials directly into DVC's runtime config
         dvc remote modify --local $REMOTE_NAME user $DVC_SSH_USERNAME
         dvc remote modify --local $REMOTE_NAME keyfile "$(pwd)/dvc_key_file"
-        dvc remote modify --local $REMOTE_NAME password "$SSH_PASS"
+        dvc remote modify --local $REMOTE_NAME password "$REMOTE_PASS"
 
         # Use full hostname for DVC remote
         dvc remote modify --local $REMOTE_NAME url "ssh://$DVC_SSH_HOSTNAME/zhome/c3/e/221590/MLOps-storage"

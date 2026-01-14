@@ -16,5 +16,7 @@ logging:
 
 data:
   batch_size: 32
+  data_dir: "data/processed"
+  gcp: false
 
 model_checkpoint: "models/model.pth"

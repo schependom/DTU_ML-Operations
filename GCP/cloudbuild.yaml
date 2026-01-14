@@ -10,12 +10,10 @@
 # build service, thus if your Dockerfile has COPY commands that copy files from the local directory to the container, these files need
 # to be in the build context.
 #
+# GCP triggers can also be setup to automatically run this build command, e.g. on every git push.
+#
 # Do note that by default all files in your .gitignore file are excluded from the build context, but you
 # can override this by using the --ignore-file flag,
-#
-# Instead of relying on manually submitting builds, we can setup the build process as continuous integration
-# such that it is triggered every time we push code to the repository.
-# This is done by setting up a TRIGGER in the GCP console.
 
 steps:
 - name: 'gcr.io/cloud-builders/docker'
@@ -24,15 +22,17 @@ steps:
     'build',
     '.',
     '-t',
-    'europe-west1-docker.pkg.dev/$PROJECT_ID/my-container-repository/my-instance',
+    'europe-west1-docker.pkg.dev/$PROJECT_ID/my-container-repository/$_IMAGE_NAME',
     '-f',
     'dockerfiles/cloud.dockerfile'
   ]
 - name: 'gcr.io/cloud-builders/docker'
-  id: 'Push container image'
+  id: 'Push container image (store in Artifact Registry)'
   args: [
     'push',
-    'europe-west1-docker.pkg.dev/$PROJECT_ID/my-container-repository/my-instance'
+    'europe-west1-docker.pkg.dev/$PROJECT_ID/my-container-repository/$_IMAGE_NAME'
   ]
 options:
   logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _IMAGE_NAME: 'my-instance'
