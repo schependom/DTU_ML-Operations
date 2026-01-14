@@ -1,0 +1,66 @@
+# There are two parts to using secrets in cloud build.
+
+#     1. First, there is the availableSecrets
+#         field that specifies what secrets from the Secret Manager should be injected into the build.
+#         In this case, we are injecting the WANDB_API_KEY and setting it as an environment variable.
+#
+#     2. The second part is the secretEnv field in the first step. This field specifies which secrets
+#         should be available in the first step.
+#
+# To make the steps dependent on each other, we use the waitFor field.
+#
+#     steps:
+#     - name: 'alpine'
+#       id: 'step1'
+#       entrypoint: 'sh'
+#       args: ['-c', 'echo "Hello World"']
+#     - name: 'alpine'
+#       id: 'step2'
+#       entrypoint: 'sh'
+#       args: ['-c', 'echo "Hello World 2"']
+#       waitFor: ['step1']
+
+steps:
+- name: "alpine"
+  id: "Replace values in the training config"
+  entrypoint: "sh"
+  args:
+    - '-c'
+    - |
+      apk add --no-cache gettext
+      envsubst < config.yaml > config.yaml.tmp
+      mv config.yaml.tmp config.yaml
+  # 2. Which secrets to inject into this step
+  secretEnv: ['WANDB_API_KEY']
+
+- name: 'alpine'
+  id: "Show config"
+  waitFor: ['Replace values in the training config']
+  entrypoint: "sh"
+  args:
+    - '-c'
+    - |
+      cat config.yaml
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'Train on vertex AI'
+  waitFor: ['Replace values in the training config']
+  args: [
+    'ai',
+    'custom-jobs',
+    'create',
+    '--region',
+    'europe-west1',
+    '--display-name',
+    'example-mlops-job',
+    '--config',
+    '${_VERTEX_TRAIN_CONFIG}',
+  ]
+substitutions:
+  _VERTEX_TRAIN_CONFIG: 'cloudbuild/config_gpu.yaml'
+
+# 1. Specify the secret to be used in the build
+availableSecrets:
+  secretManager:
+  - versionName: projects/$PROJECT_ID/secrets/WANDB_API_KEY/versions/latest
+    env: 'WANDB_API_KEY'

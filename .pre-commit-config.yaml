@@ -1,8 +1,10 @@
-# This configuration file is for pre-commit, a framework for managing and maintaining multi-language pre-commit hooks.
-# The pre-commit tool is ran before committing code to ensure code quality and consistency.
-
-# See https://pre-commit.com for more information
-# See https://pre-commit.com/hooks.html for more hooks
+# pre-commit configuration file
+#
+# I use pre-commit.ci to run all pre-commit hooks with GitHub actions,
+# such that they get automatically fixed and committed when possible.
+#
+# This makes sure that, when developers forget to run pre-commit hooks locally,
+# the codebase still stays clean.
 
 exclude: '^.github/workflows/'
 

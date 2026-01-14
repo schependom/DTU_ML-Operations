@@ -551,3 +551,104 @@ uv run coverage run --omit="tests/*" -m pytest tests/
 uv run coverage report -m
 uv run coverage html
 ```
+
+## GCP
+
+Create a VM (Gcloud Compute Engine instance):
+
+```bash
+gcloud compute instances create my-instance \
+    --zone=europe-west4-a \
+    --image-family=pytorch-2-7-cu128-ubuntu-2404-nvidia-570 \
+    --image-project=deeplearning-platform-release \
+    --accelerator="type=nvidia-tesla-v100,count=1" \
+    --maintenance-policy=TERMINATE \
+    --metadata="install-nvidia-driver=True"
+```
+
+```bash
+gcloud compute instances list
+```
+
+```bash
+gcloud compute instances start my-instance --zone=europe-west4-a
+```
+
+Start a custom job:
+
+```bash
+gcloud ai custom-jobs create \
+    --region=europe-west4-a \
+    --display-name=test-run \
+    --config=configs/GCP/config_gpu.yaml \
+    --command 'python3 src/ml_ops/train.py
+```
+
+Or connect with SSH:
+
+```bash
+# gcloud compute ssh my-instance --project=dtumlops-484016 --zone=europe-west4-a
+gcloud compute ssh --zone "europe-west4-a" --project "dtumlops-484016" "my-instance"
+```
+
+Don't forget to stop the instance after use (to avoid unnecessary costs):
+
+```bash
+gcloud compute instances stop my-instance --zone=europe-west4-a
+```
+
+To build and push Docker image to Artifact Registry:
+
+```bash
+gcloud builds submit . --config=cloudbuild/cloudbuild.yaml
+```
+
+Pull Docker image from Artifact Registry:
+
+```bash
+gcloud auth configure-docker europe-west1-docker.pkg.dev
+docker pull \
+    europe-west1-docker.pkg.dev/dtumlops-484016/my-container-repository/my-instance:latest
+```
+
+### DVC with GCP
+
+First create a new GCS bucket via the interface.
+Then, add a GCP remote:
+
+```bash
+dvc remote add -d remote_storage gs://ml_ops_data_bucket_vis/
+```
+
+Make it version aware:
+
+```bash
+dvc remote modify remote_storage version_aware true
+```
+
+Now:
+
+```bash
+git add .
+git commit -m "Add GCP remote storage"
+dvc push --no-run-cache # because GCS does not support run-cache
+dvc pull --no-run-cache
+```
+
+### Using Vertex AI
+
+First, add your secrets (e.g. `WANDB_API_KEY`) to Secret Manager in GCP.
+Make sure the cloudbuild service account has access to your secrets.
+
+```bash
+gcloud secrets add-iam-policy-binding WANDB_API_KEY \
+  --project=dtumlops-484016 \
+  --member="serviceAccount:1041875805298@cloudbuild.gserviceaccount.com" \
+  --role="roles/secretmanager.secretAccessor"
+```
+
+Now, you can use the `cloudbuild/vertex_ai_train.yaml` to run training on Vertex AI:
+
+```bash
+gcloud builds submit . --config=cloudbuild/vertex_ai_train.yaml
+```
