@@ -8,6 +8,7 @@ import hydra
 import matplotlib.pyplot as plt
 import torch
 import typer
+import wandb
 from dotenv import load_dotenv
 from hydra.utils import instantiate
 from loguru import logger
@@ -16,7 +17,6 @@ from sklearn.metrics import RocCurveDisplay, accuracy_score, f1_score, precision
 from torch.utils.data import DataLoader
 from torchvision.utils import make_grid
 
-import wandb
 from ml_ops.data import corrupt_mnist
 from ml_ops.device import DEVICE
 from ml_ops.model import MyAwesomeModel
