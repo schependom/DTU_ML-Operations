@@ -2,9 +2,8 @@ import logging
 import operator
 
 import typer
-from dotenv import load_dotenv
-
 import wandb
+from dotenv import load_dotenv
 
 # Initialize Typer app
 app = typer.Typer()
