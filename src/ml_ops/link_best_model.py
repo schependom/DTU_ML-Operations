@@ -1,9 +1,8 @@
 # Takes a sweep ID, finds the best run, and links its model artifact to a model registry.
 
 import typer
-from loguru import logger
-
 import wandb
+from loguru import logger
 
 app = typer.Typer()
 
